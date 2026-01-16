@@ -23,8 +23,6 @@ const TargetCursor: React.FC<TargetCursorProps> = ({
   const spinTl = useRef<gsap.core.Timeline | null>(null);
   const dotRef = useRef<HTMLDivElement>(null);
 
-  const isActiveRef = useRef(false);
-  const targetCornerPositionsRef = useRef<{ x: number; y: number }[] | null>(null);
   const tickerFnRef = useRef<(() => void) | null>(null);
   const activeStrengthRef = useRef({ current: 0 });
 
@@ -64,7 +62,6 @@ const TargetCursor: React.FC<TargetCursorProps> = ({
     cornersRef.current = cursor.querySelectorAll('.target-cursor-corner');
 
     let activeTarget: HTMLElement | null = null;
-    let currentLeaveHandler: (() => void) | null = null;
     let resumeTimeout: ReturnType<typeof setTimeout> | null = null;
 
     gsap.set(cursor, {
@@ -86,30 +83,40 @@ const TargetCursor: React.FC<TargetCursorProps> = ({
     createSpinTimeline();
 
     const tickerFn = () => {
-      if (!targetCornerPositionsRef.current || !cursorRef.current || !cornersRef.current) {
+      if (!cursorRef.current || !cornersRef.current || !activeTarget) {
         return;
       }
+
+      const rect = activeTarget.getBoundingClientRect();
+      const { borderWidth, cornerSize } = constants;
+      
+      const targetPositions = [
+        { x: rect.left - borderWidth, y: rect.top - borderWidth },
+        { x: rect.right + borderWidth - cornerSize, y: rect.top - borderWidth },
+        { x: rect.right + borderWidth - cornerSize, y: rect.bottom + borderWidth - cornerSize },
+        { x: rect.left - borderWidth, y: rect.bottom + borderWidth - cornerSize }
+      ];
 
       const strength = activeStrengthRef.current.current;
       if (strength === 0) return;
 
-      const cursorX = gsap.getProperty(cursorRef.current, 'x') as number;
-      const cursorY = gsap.getProperty(cursorRef.current, 'y') as number;
+      const cursorX = gsap.getProperty(cursorRef.current as HTMLElement, 'x') as number;
+      const cursorY = gsap.getProperty(cursorRef.current as HTMLElement, 'y') as number;
 
       const corners = Array.from(cornersRef.current);
       corners.forEach((corner, i) => {
-        const currentX = gsap.getProperty(corner, 'x') as number;
-        const currentY = gsap.getProperty(corner, 'y') as number;
+        const currentX = gsap.getProperty(corner as HTMLElement, 'x') as number;
+        const currentY = gsap.getProperty(corner as HTMLElement, 'y') as number;
 
-        const targetX = targetCornerPositionsRef.current![i].x - cursorX;
-        const targetY = targetCornerPositionsRef.current![i].y - cursorY;
+        const targetX = targetPositions[i].x - cursorX;
+        const targetY = targetPositions[i].y - cursorY;
 
         const finalX = currentX + (targetX - currentX) * strength;
         const finalY = currentY + (targetY - currentY) * strength;
 
         const duration = strength >= 0.99 ? (parallaxOn ? 0.2 : 0) : 0.05;
 
-        gsap.to(corner, {
+        gsap.to(corner as HTMLElement, {
           x: finalX,
           y: finalY,
           duration: duration,
@@ -124,32 +131,16 @@ const TargetCursor: React.FC<TargetCursorProps> = ({
     const moveHandler = (e: MouseEvent) => moveCursor(e.clientX, e.clientY);
     window.addEventListener('mousemove', moveHandler);
 
-    const scrollHandler = () => {
-      if (!activeTarget || !cursorRef.current) return;
-      const mouseX = gsap.getProperty(cursorRef.current, 'x') as number;
-      const mouseY = gsap.getProperty(cursorRef.current, 'y') as number;
-      const elementUnderMouse = document.elementFromPoint(mouseX, mouseY);
-      
-      const isStillOverTarget =
-        elementUnderMouse &&
-        (elementUnderMouse === activeTarget || activeTarget.contains(elementUnderMouse) || elementUnderMouse.closest(targetSelector) === activeTarget);
-      
-      if (!isStillOverTarget && currentLeaveHandler) {
-        currentLeaveHandler();
-      }
-    };
-    window.addEventListener('scroll', scrollHandler, { passive: true });
-
     const mouseDownHandler = () => {
       if (!dotRef.current) return;
       gsap.to(dotRef.current, { scale: 0.7, duration: 0.3 });
-      gsap.to(cursorRef.current, { scale: 0.9, duration: 0.2 });
+      gsap.to(cursorRef.current as HTMLElement, { scale: 0.9, duration: 0.2 });
     };
 
     const mouseUpHandler = () => {
       if (!dotRef.current) return;
       gsap.to(dotRef.current, { scale: 1, duration: 0.3 });
-      gsap.to(cursorRef.current, { scale: 1, duration: 0.2 });
+      gsap.to(cursorRef.current as HTMLElement, { scale: 1, duration: 0.2 });
     };
 
     window.addEventListener('mousedown', mouseDownHandler);
@@ -160,10 +151,6 @@ const TargetCursor: React.FC<TargetCursorProps> = ({
       if (!target || !cursorRef.current || !cornersRef.current) return;
       if (activeTarget === target) return;
       
-      if (activeTarget && currentLeaveHandler) {
-        currentLeaveHandler();
-      }
-      
       if (resumeTimeout) {
         clearTimeout(resumeTimeout);
         resumeTimeout = null;
@@ -171,26 +158,12 @@ const TargetCursor: React.FC<TargetCursorProps> = ({
 
       activeTarget = target;
       const corners = Array.from(cornersRef.current);
-      corners.forEach(corner => gsap.killTweensOf(corner));
+      corners.forEach(corner => gsap.killTweensOf(corner as HTMLElement));
 
-      gsap.killTweensOf(cursorRef.current, 'rotation');
+      gsap.killTweensOf(cursorRef.current as HTMLElement, 'rotation');
       spinTl.current?.pause();
-      gsap.set(cursorRef.current, { rotation: 0 });
+      gsap.set(cursorRef.current as HTMLElement, { rotation: 0 });
 
-      const updateTargetPositions = () => {
-        if (!activeTarget) return;
-        const rect = activeTarget.getBoundingClientRect();
-        const { borderWidth, cornerSize } = constants;
-        targetCornerPositionsRef.current = [
-          { x: rect.left - borderWidth, y: rect.top - borderWidth },
-          { x: rect.right + borderWidth - cornerSize, y: rect.top - borderWidth },
-          { x: rect.right + borderWidth - cornerSize, y: rect.bottom + borderWidth - cornerSize },
-          { x: rect.left - borderWidth, y: rect.bottom + borderWidth - cornerSize }
-        ];
-      };
-
-      updateTargetPositions();
-      isActiveRef.current = true;
       gsap.ticker.add(tickerFnRef.current!);
 
       gsap.to(activeStrengthRef.current, {
@@ -204,8 +177,6 @@ const TargetCursor: React.FC<TargetCursorProps> = ({
           gsap.ticker.remove(tickerFnRef.current);
         }
 
-        isActiveRef.current = false;
-        targetCornerPositionsRef.current = null;
         gsap.set(activeStrengthRef.current, { current: 0, overwrite: true });
 
         const prevTarget = activeTarget;
@@ -216,7 +187,8 @@ const TargetCursor: React.FC<TargetCursorProps> = ({
 
         if (cornersRef.current) {
           const cornersArr = Array.from(cornersRef.current);
-          gsap.killTweensOf(cornersArr);
+          cornersArr.forEach(c => gsap.killTweensOf(c as HTMLElement));
+          
           const { cornerSize } = constants;
           const positions = [
             { x: -cornerSize * 1.5, y: -cornerSize * 1.5 },
@@ -227,7 +199,7 @@ const TargetCursor: React.FC<TargetCursorProps> = ({
           const tl = gsap.timeline();
           cornersArr.forEach((corner, index) => {
             tl.to(
-              corner,
+              corner as HTMLElement,
               {
                 x: positions[index].x,
                 y: positions[index].y,
@@ -241,13 +213,13 @@ const TargetCursor: React.FC<TargetCursorProps> = ({
 
         resumeTimeout = setTimeout(() => {
           if (!activeTarget && cursorRef.current && spinTl.current) {
-            const currentRotation = gsap.getProperty(cursorRef.current, 'rotation') as number;
+            const currentRotation = gsap.getProperty(cursorRef.current as HTMLElement, 'rotation') as number;
             const normalizedRotation = currentRotation % 360;
             spinTl.current.kill();
             spinTl.current = gsap
               .timeline({ repeat: -1 })
-              .to(cursorRef.current, { rotation: '+=360', duration: spinDuration, ease: 'none' });
-            gsap.to(cursorRef.current, {
+              .to(cursorRef.current as HTMLElement, { rotation: '+=360', duration: spinDuration, ease: 'none' });
+            gsap.to(cursorRef.current as HTMLElement, {
               rotation: normalizedRotation + 360,
               duration: spinDuration * (1 - normalizedRotation / 360),
               ease: 'none',
@@ -260,7 +232,6 @@ const TargetCursor: React.FC<TargetCursorProps> = ({
         }, 50);
       };
 
-      currentLeaveHandler = leaveHandler;
       target.addEventListener('mouseleave', leaveHandler);
     };
 
@@ -272,14 +243,8 @@ const TargetCursor: React.FC<TargetCursorProps> = ({
       }
       window.removeEventListener('mousemove', moveHandler);
       window.removeEventListener('mouseover', enterHandler as any);
-      window.removeEventListener('scroll', scrollHandler);
       window.removeEventListener('mousedown', mouseDownHandler);
       window.removeEventListener('mouseup', mouseUpHandler);
-
-      if (activeTarget && currentLeaveHandler) {
-        activeTarget.removeEventListener('mouseleave', currentLeaveHandler);
-      }
-
       spinTl.current?.kill();
       document.body.style.cursor = originalCursor;
     };

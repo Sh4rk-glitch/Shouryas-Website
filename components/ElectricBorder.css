@@ -5,6 +5,9 @@
   border-radius: inherit;
   overflow: visible;
   isolation: isolate;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
 }
 
 .eb-canvas-container {
@@ -24,6 +27,10 @@
   position: relative;
   border-radius: inherit;
   z-index: 1;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
 }
 
 .eb-layers {

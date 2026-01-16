@@ -1,5 +1,5 @@
 
-import React, { useEffect, useRef, useCallback } from 'react';
+import React, { useEffect, useRef, useCallback, useState } from 'react';
 import './ElectricBorder.css';
 
 interface ElectricBorderProps {
@@ -26,6 +26,7 @@ const ElectricBorder: React.FC<ElectricBorderProps> = ({
   const animationRef = useRef<number>(null);
   const timeRef = useRef(0);
   const lastFrameTimeRef = useRef(0);
+  const [isVisible, setIsVisible] = useState(false);
 
   const random = useCallback((x: number) => {
     return (Math.sin(x * 12.9898) * 43758.5453) % 1;
@@ -139,20 +140,33 @@ const ElectricBorder: React.FC<ElectricBorderProps> = ({
   );
 
   useEffect(() => {
+    // Optimization: Stop drawing if component is not visible
+    const observer = new IntersectionObserver(
+      ([entry]) => setIsVisible(entry.isIntersecting),
+      { threshold: 0.1 }
+    );
+    if (containerRef.current) observer.observe(containerRef.current);
+    return () => observer.disconnect();
+  }, []);
+
+  useEffect(() => {
     const canvas = canvasRef.current;
     const container = containerRef.current;
-    if (!canvas || !container) return;
+    if (!canvas || !container || !isVisible) {
+      if (animationRef.current) cancelAnimationFrame(animationRef.current);
+      return;
+    }
 
-    const ctx = canvas.getContext('2d');
+    const ctx = canvas.getContext('2d', { alpha: true });
     if (!ctx) return;
 
-    const octaves = 10;
+    const octaves = 6; // Reduced octaves for better performance
     const lacunarity = 1.6;
     const gain = 0.7;
     const amplitude = chaos;
-    const frequency = 10;
+    const frequency = 8; // Reduced frequency
     const baseFlatness = 0;
-    const displacement = 60;
+    const displacement = 50; // Slightly smaller displacement
     const borderOffset = 60;
 
     const updateSize = () => {
@@ -173,19 +187,18 @@ const ElectricBorder: React.FC<ElectricBorderProps> = ({
     let { width, height } = updateSize();
 
     const drawElectricBorder = (currentTime: number) => {
-      if (!canvas || !ctx) return;
+      if (!canvas || !ctx || !isVisible) return;
 
       const deltaTime = (currentTime - lastFrameTimeRef.current) / 1000;
-      timeRef.current += deltaTime * speed;
+      timeRef.current += Math.min(deltaTime, 0.1) * speed; // Clamp deltaTime for stability
       lastFrameTimeRef.current = currentTime;
 
       const dpr = Math.min(window.devicePixelRatio || 1, 2);
-      ctx.setTransform(1, 0, 0, 1, 0, 0);
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      ctx.scale(dpr, dpr);
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      ctx.clearRect(0, 0, width, height);
 
       ctx.strokeStyle = color;
-      ctx.lineWidth = 1;
+      ctx.lineWidth = 1.2;
       ctx.lineCap = 'round';
       ctx.lineJoin = 'round';
 
@@ -198,7 +211,7 @@ const ElectricBorder: React.FC<ElectricBorderProps> = ({
       const radius = Math.min(borderRadius, maxRadius);
 
       const approximatePerimeter = 2 * (borderWidth + borderHeight) + 2 * Math.PI * radius;
-      const sampleCount = Math.floor(approximatePerimeter / 2);
+      const sampleCount = Math.floor(approximatePerimeter / 4); // Fewer samples for performance
 
       ctx.beginPath();
 
@@ -208,7 +221,7 @@ const ElectricBorder: React.FC<ElectricBorderProps> = ({
         const point = getRoundedRectPoint(progress, left, top, borderWidth, borderHeight, radius);
 
         const xNoise = octavedNoise(
-          progress * 8,
+          progress * 6,
           octaves,
           lacunarity,
           gain,
@@ -220,7 +233,7 @@ const ElectricBorder: React.FC<ElectricBorderProps> = ({
         );
 
         const yNoise = octavedNoise(
-          progress * 8,
+          progress * 6,
           octaves,
           lacunarity,
           gain,
@@ -241,7 +254,6 @@ const ElectricBorder: React.FC<ElectricBorderProps> = ({
         }
       }
 
-      ctx.closePath();
       ctx.stroke();
 
       animationRef.current = requestAnimationFrame(drawElectricBorder);
@@ -262,7 +274,7 @@ const ElectricBorder: React.FC<ElectricBorderProps> = ({
       }
       resizeObserver.disconnect();
     };
-  }, [color, speed, chaos, borderRadius, octavedNoise, getRoundedRectPoint]);
+  }, [color, speed, chaos, borderRadius, octavedNoise, getRoundedRectPoint, isVisible]);
 
   const vars = {
     '--electric-border-color': color,

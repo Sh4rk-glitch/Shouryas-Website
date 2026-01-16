@@ -45,25 +45,25 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project, index, theme }) => {
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-100px" }}
       transition={{ duration: 0.8, delay: index * 0.1, ease: [0.16, 1, 0.3, 1] }}
-      className="w-full h-full cursor-target relative"
+      className="w-full h-full cursor-target relative flex flex-col"
     >
       <ElectricBorder
         color={showWarning ? "#ef4444" : (isDark ? "#3b82f6" : "#2563eb")}
         speed={showWarning ? 1.5 : 0.7}
         chaos={showWarning ? 0.3 : 0.1}
         borderRadius={borderRadius}
-        className="group h-full"
+        className="group h-full flex flex-col"
       >
         <CardWrapper
           {...wrapperProps}
-          className={`relative rounded-[24px] overflow-hidden transition-all duration-500 border h-full flex flex-col block no-underline
+          className={`relative rounded-[24px] overflow-hidden transition-all duration-500 border h-full flex flex-col flex-1 no-underline
             ${isDark 
               ? 'bg-zinc-900/80 border-zinc-800/50 group-hover:border-blue-500/30 backdrop-blur-sm' 
-              : 'bg-white/90 border-zinc-200 group-hover:border-zinc-300 shadow-sm backdrop-blur-sm'}`}
+              : 'bg-[#e9e3d4]/95 border-stone-300 group-hover:border-stone-400 shadow-sm backdrop-blur-sm'}`}
         >
           <div className="aspect-video overflow-hidden relative flex-shrink-0">
             <div className={`absolute inset-0 z-10 transition-opacity duration-700 pointer-events-none
-              ${isDark ? 'bg-gradient-to-t from-zinc-950/80 to-transparent' : 'bg-gradient-to-t from-white/40 to-transparent'}`} 
+              ${isDark ? 'bg-gradient-to-t from-zinc-950/80 to-transparent' : 'bg-gradient-to-t from-[#e9e3d4]/60 to-transparent'}`} 
             />
             <img 
               src={project.imageUrl} 
@@ -71,7 +71,7 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project, index, theme }) => {
               className={`w-full h-full object-cover transition-all duration-700
                 ${isDark 
                   ? 'grayscale opacity-75 group-hover:grayscale-0 group-hover:opacity-100 group-hover:scale-105' 
-                  : 'grayscale-[0.4] opacity-90 group-hover:grayscale-0 group-hover:opacity-100 group-hover:scale-105'}`}
+                  : 'grayscale-[0.15] opacity-95 group-hover:grayscale-0 group-hover:opacity-100 group-hover:scale-105'}`}
             />
             
             <AnimatePresence>
@@ -100,13 +100,13 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project, index, theme }) => {
                 {project.title}
               </h3>
               <ExternalLink className={`w-5 h-5 transition-all duration-300
-                ${isDark ? 'text-zinc-600 group-hover:text-blue-400' : 'text-zinc-400 group-hover:text-zinc-900'}
+                ${isDark ? 'text-zinc-600 group-hover:text-blue-400' : 'text-stone-500 group-hover:text-zinc-900'}
                 ${!project.link ? 'opacity-20' : ''}`} 
               />
             </div>
             
             <p className={`mb-8 leading-relaxed font-medium flex-grow
-              ${isDark ? 'text-zinc-400' : 'text-zinc-600'}`}>
+              ${isDark ? 'text-zinc-400' : 'text-stone-700'}`}>
               {project.description}
             </p>
             
@@ -117,7 +117,7 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project, index, theme }) => {
                   className={`text-[10px] font-mono font-bold uppercase tracking-wider px-3 py-1 rounded-full border transition-colors
                     ${isDark 
                       ? 'bg-blue-500/5 border-blue-500/20 text-blue-400 group-hover:border-blue-500/40' 
-                      : 'bg-zinc-100 border-zinc-200 text-zinc-700'}`}
+                      : 'bg-stone-300/50 border-stone-400 text-stone-800'}`}
                 >
                   {tech}
                 </span>

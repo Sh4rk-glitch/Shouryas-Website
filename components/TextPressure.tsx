@@ -1,6 +1,6 @@
 
-import React, { useEffect, useRef, useState, useMemo } from 'react';
-import { motion, useSpring, useMotionValue, useTransform } from 'framer-motion';
+import React, { useEffect, useRef, useMemo } from 'react';
+import { motion, useSpring, useMotionValue } from 'framer-motion';
 
 interface TextPressureProps {
   text: string;
@@ -26,27 +26,32 @@ const TextPressure: React.FC<TextPressureProps> = ({
   italic = true,
   textColor = "#ffffff",
   strokeColor = "#ff0000",
-  minFontSize = 36,
   className = ""
 }) => {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const mouseX = useMotionValue(0);
-  const mouseY = useMotionValue(0);
+  const mouseX = useMotionValue(-1000);
+  const mouseY = useMotionValue(-1000);
 
   const chars = useMemo(() => text.split(""), [text]);
 
   useEffect(() => {
+    let frameId: number;
     const handleMouseMove = (e: MouseEvent) => {
-      mouseX.set(e.clientX);
-      mouseY.set(e.clientY);
+      // Throttle mouse updates to animation frames
+      if (frameId) cancelAnimationFrame(frameId);
+      frameId = requestAnimationFrame(() => {
+        mouseX.set(e.clientX);
+        mouseY.set(e.clientY);
+      });
     };
     window.addEventListener('mousemove', handleMouseMove, { passive: true });
-    return () => window.removeEventListener('mousemove', handleMouseMove);
+    return () => {
+      window.removeEventListener('mousemove', handleMouseMove);
+      if (frameId) cancelAnimationFrame(frameId);
+    };
   }, [mouseX, mouseY]);
 
   return (
     <div 
-      ref={containerRef}
       className={`relative flex flex-wrap justify-center items-center w-full select-none will-change-transform ${className}`}
       style={{ gap: flex ? '0' : '0.1em' }}
     >
@@ -83,11 +88,12 @@ interface CharItemProps {
 }
 
 const CharItem: React.FC<CharItemProps> = ({ 
-  char, textColor, stroke, strokeColor, useWeight, useWidth, useItalic, useAlpha, mouseX, mouseY 
+  char, textColor, stroke, strokeColor, useWeight, useWidth, useAlpha, mouseX, mouseY 
 }) => {
   const ref = useRef<HTMLSpanElement>(null);
   
-  const springConfig = { stiffness: 250, damping: 25, mass: 0.5 };
+  // Use a slightly stiffer/faster spring for better performance on low-end CPUs
+  const springConfig = { stiffness: 300, damping: 35, mass: 0.5 };
   
   const weightVal = useSpring(400, springConfig);
   const stretchVal = useSpring(100, springConfig);
@@ -101,20 +107,31 @@ const CharItem: React.FC<CharItemProps> = ({
       const centerX = rect.left + rect.width / 2;
       const centerY = rect.top + rect.height / 2;
       
-      const distance = Math.sqrt(
-        Math.pow(mouseX.get() - centerX, 2) + 
-        Math.pow(mouseY.get() - centerY, 2)
-      );
-
-      const radius = window.innerWidth < 768 ? 120 : 280;
-      const strength = Math.max(0, 1 - distance / radius);
+      const mX = mouseX.get();
+      const mY = mouseY.get();
       
-      const easedStrength = Math.pow(strength, 1.5);
+      // Early exit if mouse is far away to avoid unnecessary spring updates
+      const dx = mX - centerX;
+      const dy = mY - centerY;
+      const distSq = dx * dx + dy * dy;
+      const radius = window.innerWidth < 768 ? 100 : 200;
+      const radiusSq = radius * radius;
+
+      if (distSq > radiusSq) {
+        if (weightVal.get() !== 400) weightVal.set(400);
+        if (stretchVal.get() !== 100) stretchVal.set(100);
+        if (opacityVal.get() !== 1) opacityVal.set(1);
+        if (scaleVal.get() !== 1) scaleVal.set(1);
+        return;
+      }
+
+      const strength = 1 - Math.sqrt(distSq) / radius;
+      const easedStrength = strength * strength; // Simpler curve for performance
 
       if (useWeight) weightVal.set(400 + easedStrength * 500);
       if (useWidth) stretchVal.set(100 + easedStrength * 35);
       if (useAlpha) opacityVal.set(0.7 + easedStrength * 0.3);
-      scaleVal.set(1 + easedStrength * 0.15);
+      scaleVal.set(1 + easedStrength * 0.12);
     };
 
     const unsubscribeX = mouseX.on("change", updatePressure);

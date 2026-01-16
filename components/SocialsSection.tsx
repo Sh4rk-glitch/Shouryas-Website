@@ -7,7 +7,23 @@ interface SocialsSectionProps {
   theme: 'light' | 'dark';
 }
 
-const SocialCard = ({ social, index, springProgress, theme }: { social: any, index: number, springProgress: any, theme: 'light' | 'dark' }) => {
+interface SocialCardProps {
+  social: {
+    id: string;
+    name: string;
+    icon: React.ReactNode;
+    url: string;
+    tag: string;
+    color: string;
+    features: React.ElementType[];
+  };
+  index: number;
+  springProgress: any;
+  theme: 'light' | 'dark';
+}
+
+// Fixed: Explicitly typed SocialCard as React.FC to resolve the 'key' property error during component mapping
+const SocialCard: React.FC<SocialCardProps> = ({ social, index, springProgress, theme }) => {
   const isDark = theme === 'dark';
   const cardRef = useRef<HTMLDivElement>(null);
   const mouseX = useMotionValue(0);
@@ -40,7 +56,7 @@ const SocialCard = ({ social, index, springProgress, theme }: { social: any, ind
         className={`group relative block h-[450px] rounded-[2rem] border overflow-hidden transition-all duration-500 cursor-target
           ${isDark 
             ? 'bg-zinc-900/40 border-white/5 backdrop-blur-2xl' 
-            : 'bg-white/80 border-zinc-200 shadow-xl shadow-zinc-200/50 backdrop-blur-md'}`}
+            : 'bg-[#e3dbcc]/80 border-stone-300 shadow-xl shadow-stone-400/30 backdrop-blur-md'}`}
       >
         <motion.div 
           className="absolute inset-0 z-0 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-500"
@@ -57,20 +73,20 @@ const SocialCard = ({ social, index, springProgress, theme }: { social: any, ind
 
         <div className="absolute top-6 left-6 flex items-center gap-2">
           <div className={`w-1.5 h-1.5 rounded-full animate-pulse`} style={{ backgroundColor: social.color }} />
-          <span className={`text-[8px] font-mono tracking-[0.2em] uppercase ${isDark ? 'text-zinc-500' : 'text-zinc-400'}`}>
+          <span className={`text-[8px] font-mono tracking-[0.2em] uppercase ${isDark ? 'text-zinc-500' : 'text-stone-600'}`}>
             Status: Active // {social.id}
           </span>
         </div>
 
         <div className="absolute top-6 right-6">
-          <ArrowUpRight className={`w-5 h-5 transition-transform duration-500 group-hover:translate-x-1 group-hover:-translate-y-1 ${isDark ? 'text-zinc-700' : 'text-zinc-300'}`} />
+          <ArrowUpRight className={`w-5 h-5 transition-transform duration-500 group-hover:translate-x-1 group-hover:-translate-y-1 ${isDark ? 'text-zinc-700' : 'text-stone-400'}`} />
         </div>
 
         <div className="relative z-10 h-full p-10 flex flex-col justify-between">
           <div className="mt-12">
             <div 
               className={`w-20 h-20 rounded-3xl flex items-center justify-center mb-8 transition-all duration-500 group-hover:scale-110 group-hover:rotate-3
-                ${isDark ? 'bg-zinc-800 text-white shadow-2xl' : 'bg-zinc-100 text-zinc-900 shadow-lg'}`}
+                ${isDark ? 'bg-zinc-800 text-white shadow-2xl' : 'bg-stone-300 text-zinc-900 shadow-lg'}`}
               style={{ boxShadow: `0 20px 40px -10px ${social.color}20` }}
             >
               {social.icon}
@@ -80,21 +96,21 @@ const SocialCard = ({ social, index, springProgress, theme }: { social: any, ind
               <h3 className={`text-3xl font-black uppercase tracking-tighter ${isDark ? 'text-white' : 'text-zinc-900'}`}>
                 {social.name}
               </h3>
-              <p className={`text-xs font-mono tracking-widest ${isDark ? 'text-zinc-500' : 'text-zinc-400'}`}>
+              <p className={`text-xs font-mono tracking-widest ${isDark ? 'text-zinc-500' : 'text-stone-700'}`}>
                 {social.tag}
               </p>
             </div>
           </div>
 
           <div className="space-y-6">
-            <div className={`h-[1px] w-full ${isDark ? 'bg-white/5' : 'bg-zinc-100'}`} />
+            <div className={`h-[1px] w-full ${isDark ? 'bg-white/5' : 'bg-stone-300'}`} />
             <div className="flex justify-between items-center">
               <div className="flex gap-4">
                 {social.features.map((Icon: any, i: number) => (
-                  <Icon key={i} size={14} className={isDark ? 'text-zinc-700' : 'text-zinc-300'} />
+                  <Icon key={i} size={14} className={isDark ? 'text-zinc-700' : 'text-stone-500'} />
                 ))}
               </div>
-              <span className={`text-[10px] font-mono font-bold px-3 py-1 rounded-full border ${isDark ? 'border-white/5 text-zinc-600' : 'border-zinc-100 text-zinc-400'}`}>
+              <span className={`text-[10px] font-mono font-bold px-3 py-1 rounded-full border ${isDark ? 'border-white/5 text-zinc-600' : 'border-stone-400 text-stone-700'}`}>
                 LINK_SECURE
               </span>
             </div>
@@ -173,11 +189,11 @@ const SocialsSection: React.FC<SocialsSectionProps> = ({ theme }) => {
         className="text-center mb-32 z-10 px-6"
       >
         <div className="inline-flex items-center gap-3 mb-6">
-          <div className={`h-[1px] w-8 ${isDark ? 'bg-zinc-800' : 'bg-zinc-200'}`} />
-          <h2 className={`text-xs font-mono uppercase tracking-[0.8em] ${isDark ? 'text-zinc-500' : 'text-zinc-400'}`}>
+          <div className={`h-[1px] w-8 ${isDark ? 'bg-zinc-800' : 'bg-stone-400'}`} />
+          <h2 className={`text-xs font-mono uppercase tracking-[0.8em] ${isDark ? 'text-zinc-500' : 'text-stone-600'}`}>
             Click on the cards to visit my socials
           </h2>
-          <div className={`h-[1px] w-8 ${isDark ? 'bg-zinc-800' : 'bg-zinc-200'}`} />
+          <div className={`h-[1px] w-8 ${isDark ? 'bg-zinc-800' : 'bg-stone-400'}`} />
         </div>
         <h2 className={`text-6xl md:text-8xl font-black uppercase tracking-tighter leading-none ${isDark ? 'text-white' : 'text-zinc-950'}`}>
           My Socials<span className="text-blue-500">.</span>
@@ -196,7 +212,7 @@ const SocialsSection: React.FC<SocialsSectionProps> = ({ theme }) => {
         ))}
       </div>
 
-      <div className={`absolute bottom-20 left-10 pointer-events-none hidden xl:block font-mono text-[8px] tracking-widest ${isDark ? 'text-zinc-800' : 'text-zinc-300'}`}>
+      <div className={`absolute bottom-20 left-10 pointer-events-none hidden xl:block font-mono text-[8px] tracking-widest ${isDark ? 'text-zinc-800' : 'text-stone-500'}`}>
         [ COORDINATES: 37.7749° N, 122.4194° W ]<br />
         [ SYSTEM_ENTROPY: 0.00342 ]<br />
         [ ENCRYPTION_STRENGTH: AES-256 ]
