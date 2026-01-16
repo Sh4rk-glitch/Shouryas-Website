@@ -62,7 +62,7 @@ const ContactSection: React.FC<ContactSectionProps> = ({ theme }) => {
       });
 
       if (response.ok) {
-        // Ensure the cool animation plays for at least a bit even if the request is fast
+        
         await new Promise(resolve => setTimeout(resolve, 1500));
         setStatus('success');
       } else {

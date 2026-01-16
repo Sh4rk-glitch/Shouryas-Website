@@ -140,7 +140,7 @@ const ElectricBorder: React.FC<ElectricBorderProps> = ({
   );
 
   useEffect(() => {
-    // Optimization: Stop drawing if component is not visible
+    
     const observer = new IntersectionObserver(
       ([entry]) => setIsVisible(entry.isIntersecting),
       { threshold: 0.1 }
@@ -160,13 +160,13 @@ const ElectricBorder: React.FC<ElectricBorderProps> = ({
     const ctx = canvas.getContext('2d', { alpha: true });
     if (!ctx) return;
 
-    const octaves = 6; // Reduced octaves for better performance
+    const octaves = 6; 
     const lacunarity = 1.6;
     const gain = 0.7;
     const amplitude = chaos;
-    const frequency = 8; // Reduced frequency
+    const frequency = 8; 
     const baseFlatness = 0;
-    const displacement = 50; // Slightly smaller displacement
+    const displacement = 50; 
     const borderOffset = 60;
 
     const updateSize = () => {
@@ -190,7 +190,7 @@ const ElectricBorder: React.FC<ElectricBorderProps> = ({
       if (!canvas || !ctx || !isVisible) return;
 
       const deltaTime = (currentTime - lastFrameTimeRef.current) / 1000;
-      timeRef.current += Math.min(deltaTime, 0.1) * speed; // Clamp deltaTime for stability
+      timeRef.current += Math.min(deltaTime, 0.1) * speed; 
       lastFrameTimeRef.current = currentTime;
 
       const dpr = Math.min(window.devicePixelRatio || 1, 2);
@@ -211,7 +211,7 @@ const ElectricBorder: React.FC<ElectricBorderProps> = ({
       const radius = Math.min(borderRadius, maxRadius);
 
       const approximatePerimeter = 2 * (borderWidth + borderHeight) + 2 * Math.PI * radius;
-      const sampleCount = Math.floor(approximatePerimeter / 4); // Fewer samples for performance
+      const sampleCount = Math.floor(approximatePerimeter / 4); 
 
       ctx.beginPath();
 

@@ -36,7 +36,7 @@ const TextPressure: React.FC<TextPressureProps> = ({
   useEffect(() => {
     let frameId: number;
     const handleMouseMove = (e: MouseEvent) => {
-      // Throttle mouse updates to animation frames
+      
       if (frameId) cancelAnimationFrame(frameId);
       frameId = requestAnimationFrame(() => {
         mouseX.set(e.clientX);
@@ -92,7 +92,6 @@ const CharItem: React.FC<CharItemProps> = ({
 }) => {
   const ref = useRef<HTMLSpanElement>(null);
   
-  // Use a slightly stiffer/faster spring for better performance on low-end CPUs
   const springConfig = { stiffness: 300, damping: 35, mass: 0.5 };
   
   const weightVal = useSpring(400, springConfig);
@@ -110,7 +109,6 @@ const CharItem: React.FC<CharItemProps> = ({
       const mX = mouseX.get();
       const mY = mouseY.get();
       
-      // Early exit if mouse is far away to avoid unnecessary spring updates
       const dx = mX - centerX;
       const dy = mY - centerY;
       const distSq = dx * dx + dy * dy;
@@ -126,7 +124,7 @@ const CharItem: React.FC<CharItemProps> = ({
       }
 
       const strength = 1 - Math.sqrt(distSq) / radius;
-      const easedStrength = strength * strength; // Simpler curve for performance
+      const easedStrength = strength * strength; 
 
       if (useWeight) weightVal.set(400 + easedStrength * 500);
       if (useWidth) stretchVal.set(100 + easedStrength * 35);

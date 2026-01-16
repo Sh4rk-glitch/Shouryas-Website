@@ -18,8 +18,7 @@ const App: React.FC = () => {
 
   const toggleTheme = () => setTheme(prev => prev === 'dark' ? 'light' : 'dark');
 
-  // Background colors shifted to a much deeper "warm greige" to eliminate glare.
-  // Using more saturated beige tones like Linen and Stone.
+ 
   const backgroundColor = useTransform(
     scrollYProgress,
     [0, 0.1, 0.3, 0.85, 0.95, 1],

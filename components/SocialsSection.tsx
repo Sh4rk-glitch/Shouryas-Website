@@ -22,7 +22,6 @@ interface SocialCardProps {
   theme: 'light' | 'dark';
 }
 
-// Fixed: Explicitly typed SocialCard as React.FC to resolve the 'key' property error during component mapping
 const SocialCard: React.FC<SocialCardProps> = ({ social, index, springProgress, theme }) => {
   const isDark = theme === 'dark';
   const cardRef = useRef<HTMLDivElement>(null);
