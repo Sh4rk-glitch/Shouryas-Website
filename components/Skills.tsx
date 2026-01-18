@@ -1,4 +1,3 @@
-
 import React, { useRef } from 'react';
 import { motion, useMotionValue, useTransform, useSpring } from 'framer-motion';
 import { Code, Cpu, Layers, Terminal, Hexagon } from 'lucide-react';

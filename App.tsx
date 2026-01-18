@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { motion, useScroll, useTransform } from 'framer-motion';
 import Hero from './components/Hero';
@@ -79,7 +78,7 @@ const App: React.FC = () => {
         {/* Timeline Section */}
         <Experience theme={theme} />
 
-        {/* Tech Cluster Section (formerly TechMarquee) */}
+        {/* Tech Cluster Section */}
         <TechMarquee theme={theme} />
 
         <Portfolio theme={theme} />

@@ -1,5 +1,3 @@
-
-// Add React to the import to fix "Cannot find namespace 'React'" errors
 import React, { useEffect, useMemo, useRef } from 'react';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';

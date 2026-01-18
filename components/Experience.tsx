@@ -1,4 +1,3 @@
-
 import React, { useRef } from 'react';
 import { motion, useScroll, useSpring, useTransform } from 'framer-motion';
 import { Briefcase, GraduationCap, Award, Cpu } from 'lucide-react';
@@ -54,7 +53,6 @@ const Experience: React.FC<{ theme: 'light' | 'dark' }> = ({ theme }) => {
     restDelta: 0.001
   });
 
-  // Locked axis position classes
   const axisXClass = "left-10 md:left-24";
 
   return (
@@ -80,7 +78,7 @@ const Experience: React.FC<{ theme: 'light' | 'dark' }> = ({ theme }) => {
         {/* Persistent Timeline Track (The Rail) */}
         <div 
           className={`absolute ${axisXClass} top-0 bottom-0 w-[2px] md:w-[4px] z-0 rounded-full ${isDark ? 'bg-zinc-900' : 'bg-stone-200'}`}
-          style={{ transform: 'translateX(-50%)' }} // Static CSS transform for the background rail
+          style={{ transform: 'translateX(-50%)' }} 
         >
           {/* Active Progress Overlay (The Glow Line) */}
           <motion.div 
@@ -96,7 +94,7 @@ const Experience: React.FC<{ theme: 'light' | 'dark' }> = ({ theme }) => {
           {experiences.map((exp, index) => (
             <div key={index} className="relative flex items-start">
               
-              {/* Icon Container - Using Framer Motion 'x' for centering to avoid transform conflicts */}
+              {/* Icon Container */}
               <motion.div 
                 initial={{ scale: 0.5, opacity: 0, x: "-50%" }}
                 whileInView={{ scale: 1, opacity: 1, x: "-50%" }}
@@ -104,7 +102,7 @@ const Experience: React.FC<{ theme: 'light' | 'dark' }> = ({ theme }) => {
                 transition={{ 
                   scale: { type: "spring", stiffness: 300, damping: 25, delay: 0.1 },
                   opacity: { duration: 0.5, delay: 0.1 },
-                  x: { duration: 0 } // Keep centering static during animation
+                  x: { duration: 0 }
                 }}
                 className={`absolute ${axisXClass} w-14 h-14 md:w-20 md:h-20 rounded-[1.5rem] flex items-center justify-center z-20 shadow-2xl border transition-colors duration-500
                 ${isDark ? 'bg-zinc-950 border-zinc-800 text-zinc-500' : 'bg-white border-stone-200 text-stone-400'}`}

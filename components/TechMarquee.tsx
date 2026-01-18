@@ -122,8 +122,6 @@ const TechItemBubble: React.FC<{ item: TechItem; isDark: boolean }> = ({ item, i
 const TechMarquee: React.FC<{ theme: 'light' | 'dark' }> = ({ theme }) => {
   const isDark = theme === 'dark';
 
-  // 18 items in a 4-3-4-3-4 pattern.
-  // This distribution creates a natural hexagonal honeycomb interlock when centered.
   const rowCounts = [4, 3, 4, 3, 4];
   let currentIdx = 0;
   const rows = rowCounts.map(count => {
@@ -163,7 +161,6 @@ const TechMarquee: React.FC<{ theme: 'light' | 'dark' }> = ({ theme }) => {
             key={`row-${rowIndex}`}
             className="flex justify-center gap-6 md:gap-14 w-full"
             style={{ 
-              // Moving row n+1 up into the gaps of row n creates the hex effect
               marginTop: rowIndex > 0 ? 'clamp(-12px, -3vw, -28px)' : '0' 
             }}
           >

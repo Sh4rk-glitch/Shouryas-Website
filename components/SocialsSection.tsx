@@ -1,4 +1,3 @@
-
 import React, { useRef, useState, useEffect } from 'react';
 import { motion, useScroll, useTransform, useSpring, useMotionValue } from 'framer-motion';
 import { Github, Linkedin, Instagram, Mail, ArrowUpRight, Cpu, Globe, Zap } from 'lucide-react';

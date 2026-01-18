@@ -1,4 +1,3 @@
-
 import React, { useState, useRef, useEffect } from 'react';
 import { motion, useScroll, useTransform, AnimatePresence } from 'framer-motion';
 import { Send, Cpu, ShieldCheck, Zap, CheckCircle2, Terminal, RefreshCcw, AlertTriangle } from 'lucide-react';
