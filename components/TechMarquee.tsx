@@ -152,7 +152,7 @@ const TechMarquee: React.FC<{ theme: 'light' | 'dark' }> = ({ theme }) => {
           <div className={`h-[1px] w-12 ${isDark ? 'bg-zinc-800' : 'bg-stone-300'}`} />
         </motion.div>
         <h2 className={`text-5xl md:text-8xl font-black uppercase tracking-tighter leading-none ${isDark ? 'text-white' : 'text-zinc-950'}`}>
-          The Full Stack Stack<span className="text-blue-500">.</span>
+          The Full Stack<span className="text-blue-500">.</span>
         </h2>
       </div>
 
