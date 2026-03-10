@@ -84,7 +84,7 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project, index, theme }) => {
                   <div className="flex flex-col items-center gap-4 text-white text-center p-6">
                     <AlertCircle size={32} className="text-red-500 animate-pulse" />
                     <p className="font-mono text-xs uppercase tracking-[0.2em]">
-                      This project doesn't have a link yet
+                      This project doesn't have a link yet, working on it!
                     </p>
                   </div>
                 </motion.div>
